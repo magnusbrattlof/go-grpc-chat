@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package gchat;
+
+import "google/protobuf/timestamp.proto";
+
+message UserContent {
+    string username = 2;
+    string password = 3;
+}
+
+message ChatMessage {
+    int32 sequence = 1;
+    string message = 2;
+    google.protobuf.Timestamp timestamp = 3;
+}
+
+message RegisterResponse {
+    string token = 1;
+}
+
+message LoginResponse {
+    string token = 1;
+}
+
+message LogoutResponse {
+    string token = 1;
+}
+
+service ChatService {
+    rpc Register(UserContent) returns (RegisterResponse) {}
+    rpc Login(UserContent) returns (LoginResponse) {}
+    rpc Logout(UserContent) returns (LogoutResponse) {}
+}
