@@ -27,8 +27,13 @@ message LogoutResponse {
     string token = 1;
 }
 
+message MessageResponse {
+    bool val = 1;
+}
+
 service ChatService {
     rpc Register(UserContent) returns (RegisterResponse) {}
     rpc Login(UserContent) returns (LoginResponse) {}
     rpc Logout(UserContent) returns (LogoutResponse) {}
+    rpc SendMessage(ChatMessage) returns (MessageResponse) {}
 }
