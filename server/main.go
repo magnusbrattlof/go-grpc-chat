@@ -32,7 +32,9 @@ func (s *Server) Register(ctx context.Context, in *gchat.UserContent) (*gchat.Re
 	}
 
 	token := tokenGenerator()
+
 	database = append(database, User{username: &in.Username, password: &in.Password, token: token})
+	
 	fmt.Println(len(database))
 	printUsers()
 	return &gchat.RegisterResponse{Token: token}, nil

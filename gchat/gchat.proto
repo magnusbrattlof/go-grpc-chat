@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package gchat;
 
-import "google/protobuf/timestamp.proto";
-
 message UserContent {
     string username = 2;
     string password = 3;
@@ -12,7 +10,6 @@ message UserContent {
 message ChatMessage {
     int32 sequence = 1;
     string message = 2;
-    google.protobuf.Timestamp timestamp = 3;
 }
 
 message RegisterResponse {
