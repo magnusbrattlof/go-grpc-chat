@@ -1,49 +1,14 @@
-package main
+package handler
 
 import (
 	"context"
 	"fmt"
 	"log"
 
-	"../gchat"
-	"google.golang.org/grpc"
+	"github.com/magnusbrattlof/go-grpc-chat/gchat"
 )
 
-func main() {
-	var (
-		conn               *grpc.ClientConn
-		option             int
-	)
-
-	fmt.Println("Welcome to go-grpc-chat\nWhat would you like to do?")
-
-	conn, err := grpc.Dial(":7777", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Error connecting: %v", err)
-	}
-
-	defer conn.Close()
-
-	c := gchat.NewChatServiceClient(conn)
-
-	for {
-		fmt.Println("1) \t Register")
-		fmt.Println("2) \t Chat")
-		fmt.Println("3) \t Exit")
-		fmt.Scanf("%d", &option)
-
-		switch option {
-		
-		case 1:
-			token, err := register_handler(c)
-		
-		case 2:
-
-		}
-	}
-}
-
-func message_handler(c gchat.ChatServiceClient, token string) {
+func Message_handler(c gchat.ChatServiceClient, token string) {
 	var message string
 	var sequence int32 = 0
 
@@ -59,7 +24,7 @@ func message_handler(c gchat.ChatServiceClient, token string) {
 	}
 }
 
-func register_handler(c gchat.ChatServiceClient) (*string, error) {
+func Register_handler(c gchat.ChatServiceClient) (*string, error) {
 	var username, password string
 
 	fmt.Printf("Username: ")

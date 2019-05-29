@@ -1,11 +1,14 @@
 package main
 
+
 import (
+	"time"
 	"fmt"
 	"log"
-	"time"
-
 	"github.com/marcusolsson/tui-go"
+	"github.com/magnusbrattlof/go-grpc-chat/gchat"
+	"github.com/magnusbrattlof/go-grpc-chat/gchat/handler"
+	"google.golang.org/grpc"
 )
 
 type post struct {
@@ -20,16 +23,27 @@ var posts = []post{
 }
 
 func main() {
-	sidebar := tui.NewVBox(
-		tui.NewLabel("CHANNELS"),
-		tui.NewLabel("general"),
-		tui.NewLabel("random"),
-		tui.NewLabel(""),
-		tui.NewLabel("DIRECT MESSAGES"),
-		tui.NewLabel("slackbot"),
-		tui.NewSpacer(),
-	)
-	sidebar.SetBorder(true)
+
+	c := initialize_handler()
+	
+	fmt.Println("Welcome to go-grpc-chat\nWhat would you like to do?")
+
+	fmt.Println("1) Register\n2) Chat\n3) Exit")
+	fmt.Scanf("%s", &option)
+
+	switch option {
+	case 1:
+		handler.Register_handler(c)
+		
+	}
+
+
+
+	//gui_chat_handler()
+
+}
+
+func gui_chat_handler() {
 
 	history := tui.NewVBox()
 
@@ -67,9 +81,10 @@ func main() {
 			tui.NewSpacer(),
 		))
 		input.SetText("")
+		// Here we can add functions that we want to execute whenever we have user input
 	})
 
-	root := tui.NewHBox(sidebar, chat)
+	root := tui.NewHBox(chat)
 
 	ui, err := tui.New(root)
 	if err != nil {
@@ -81,4 +96,19 @@ func main() {
 	if err := ui.Run(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func initialize_handler() gchat.ChatServiceClient {
+	var (
+		conn               *grpc.ClientConn
+	)
+
+	conn, err := grpc.Dial(":7777", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Error connecting: %v", err)
+	}
+
+	defer conn.Close()
+
+	return gchat.NewChatServiceClient(conn)
 }
