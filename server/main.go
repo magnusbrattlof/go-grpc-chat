@@ -8,7 +8,7 @@ import (
 	"log"
 	"net"
 
-	"../gchat"
+	"github.com/magnusbrattlof/go-grpc-chat/gchat"
 	"google.golang.org/grpc"
 )
 
@@ -52,6 +52,8 @@ func (s *Server) Logout(ctx context.Context, in *gchat.UserContent) (*gchat.Logo
 
 func (s *Server) SendMessage(ctx context.Context, in *gchat.ChatMessage) (*gchat.MessageResponse, error) {
 
+	fmt.Printf("Received message: %s in sequence: %d", in.Message, in.Sequence)
+
 	return &gchat.MessageResponse{Val: true}, nil
 }
 
@@ -83,6 +85,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	gchat.RegisterChatServiceServer(grpcServer, &s)
 
+	log.Println("Server is running...")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Error serving: %v", err)
 	}

@@ -24,22 +24,52 @@ var posts = []post{
 
 func main() {
 
-	c := initialize_handler()
+	var (
+		conn               *grpc.ClientConn
+		option int
+		token *string
+		err error
+	)
+
+	token = nil
+	conn, err = grpc.Dial(":7777", grpc.WithInsecure())
+
+	if err != nil {
+		log.Fatalf("Error connecting: %v", err)
+	}
+
+	defer conn.Close()
+
+	c := gchat.NewChatServiceClient(conn)
+
 	
 	fmt.Println("Welcome to go-grpc-chat\nWhat would you like to do?")
 
-	fmt.Println("1) Register\n2) Chat\n3) Exit")
-	fmt.Scanf("%s", &option)
+	for {
 
-	switch option {
-	case 1:
-		handler.Register_handler(c)
+		fmt.Println("1) Register\n2) Chat\n3) Exit")
+		fmt.Scanf("%d", &option)
+
+		switch option {
+
+		case 1:
+			token, err = handler.Register_handler(c)
+			
+			if err != nil {
+				fmt.Println("Error, could not register")
+			}
 		
+		case 2:
+			err = handler.Message_handler(c, token)
+
+			if err != nil {
+				fmt.Println(err)
+			}
+
+		}
 	}
-
-
-
-	//gui_chat_handler()
+	
+	//
 
 }
 
@@ -96,19 +126,4 @@ func gui_chat_handler() {
 	if err := ui.Run(); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func initialize_handler() gchat.ChatServiceClient {
-	var (
-		conn               *grpc.ClientConn
-	)
-
-	conn, err := grpc.Dial(":7777", grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Error connecting: %v", err)
-	}
-
-	defer conn.Close()
-
-	return gchat.NewChatServiceClient(conn)
 }
