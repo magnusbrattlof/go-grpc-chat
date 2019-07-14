@@ -18,9 +18,16 @@ type User struct {
 	token    string
 }
 
-var database []User
+var (
+	database []User
+	chats []*gchat.Chats
+)
 
 type Server struct {
+}
+
+func init() {
+	chats = append(chats, &gchat.Chats{ChatName: "family"})
 }
 
 func (s *Server) Register(ctx context.Context, in *gchat.UserContent) (*gchat.RegisterResponse, error) {
@@ -34,25 +41,37 @@ func (s *Server) Register(ctx context.Context, in *gchat.UserContent) (*gchat.Re
 	token := tokenGenerator()
 
 	database = append(database, User{username: &in.Username, password: &in.Password, token: token})
-	
-	fmt.Println(len(database))
-	printUsers()
+
 	return &gchat.RegisterResponse{Token: token}, nil
 }
 
+func (s *Server) GetChats(in *gchat.RegisterResponse, stream gchat.ChatService_GetChatsServer) error {
+	for _, chat := range chats {
+		if err := stream.Send(chat); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *Server) CreateChat(ctx context.Context, in *gchat.Chats) (*gchat.Response, error) {
+	//
+	return nil, nil
+}
+
 func (s *Server) Login(ctx context.Context, in *gchat.UserContent) (*gchat.LoginResponse, error) {
-	fmt.Printf("Your username was: %s and password: %s", in.Username, in.Password)
+	fmt.Printf("Your username was: %s and password: %s\n", in.Username, in.Password)
 	return &gchat.LoginResponse{Token: "hello"}, nil
 }
 
 func (s *Server) Logout(ctx context.Context, in *gchat.UserContent) (*gchat.LogoutResponse, error) {
-	fmt.Printf("Your username was: %s and password: %s", in.Username, in.Password)
+	fmt.Printf("Your username was: %s and password: %s\n", in.Username, in.Password)
 	return &gchat.LogoutResponse{Token: "hello"}, nil
 }
 
 func (s *Server) SendMessage(ctx context.Context, in *gchat.ChatMessage) (*gchat.MessageResponse, error) {
 
-	fmt.Printf("Received message: %s in sequence: %d", in.Message, in.Sequence)
+	fmt.Printf("Received message: %s in sequence: %d\n", in.Message, in.Sequence)
 
 	return &gchat.MessageResponse{Val: true}, nil
 }

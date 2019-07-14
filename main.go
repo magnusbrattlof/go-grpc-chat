@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"log"
 	"github.com/marcusolsson/tui-go"
-	"github.com/magnusbrattlof/go-grpc-chat/gchat"
 	"github.com/magnusbrattlof/go-grpc-chat/gchat/handler"
-	"google.golang.org/grpc"
 )
 
 type post struct {
@@ -22,27 +20,14 @@ var posts = []post{
 	{username: "jane", message: "not much", time: "14:43"},
 }
 
+var (
+	option int
+	err error
+	userData *handler.UserData
+)
+
 func main() {
 
-	var (
-		conn               *grpc.ClientConn
-		option int
-		token *string
-		err error
-	)
-
-	token = nil
-	conn, err = grpc.Dial(":7777", grpc.WithInsecure())
-
-	if err != nil {
-		log.Fatalf("Error connecting: %v", err)
-	}
-
-	defer conn.Close()
-
-	c := gchat.NewChatServiceClient(conn)
-
-	
 	fmt.Println("Welcome to go-grpc-chat\nWhat would you like to do?")
 
 	for {
@@ -53,28 +38,24 @@ func main() {
 		switch option {
 
 		case 1:
-			token, err = handler.Register_handler(c)
-			
+			userData, err = handler.Register()
+
 			if err != nil {
 				fmt.Println("Error, could not register")
 			}
-		
+
 		case 2:
-			err = handler.Message_handler(c, token)
-
-			if err != nil {
-				fmt.Println(err)
-			}
-
+			handler.GetChats()
+			gui_chat_handler()
 		}
 	}
-	
-	//
-
 }
 
 func gui_chat_handler() {
 
+	if userData == nil {
+		log.Fatalf("You have not signed in yet")
+	}
 	history := tui.NewVBox()
 
 	for _, m := range posts {
@@ -104,14 +85,15 @@ func gui_chat_handler() {
 	chat.SetSizePolicy(tui.Expanding, tui.Expanding)
 
 	input.OnSubmit(func(e *tui.Entry) {
+		handler.SendMessage(e.Text(), userData.Token)
+
 		history.Append(tui.NewHBox(
 			tui.NewLabel(time.Now().Format("15:04")),
-			tui.NewPadder(1, 0, tui.NewLabel(fmt.Sprintf("<%s>", "john"))),
+			tui.NewPadder(1, 0, tui.NewLabel(fmt.Sprintf("<%s>", userData.Username))),
 			tui.NewLabel(e.Text()),
 			tui.NewSpacer(),
 		))
 		input.SetText("")
-		// Here we can add functions that we want to execute whenever we have user input
 	})
 
 	root := tui.NewHBox(chat)

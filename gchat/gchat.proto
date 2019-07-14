@@ -3,8 +3,9 @@ syntax = "proto3";
 package gchat;
 
 message UserContent {
-    string username = 2;
-    string password = 3;
+    string username = 1;
+    string password = 2;
+	string chatName = 3;
 }
 
 message ChatMessage {
@@ -28,9 +29,23 @@ message MessageResponse {
     bool val = 1;
 }
 
+message Chats {
+	string chatName = 1;
+}
+
+message Response {
+	bool success = 1;
+}
+
+service Receiver {
+	rpc ReceiveMessage(ChatMessage) returns (MessageResponse){}
+}
+
 service ChatService {
     rpc Register(UserContent) returns (RegisterResponse) {}
     rpc Login(UserContent) returns (LoginResponse) {}
     rpc Logout(UserContent) returns (LogoutResponse) {}
     rpc SendMessage(ChatMessage) returns (MessageResponse) {}
+	rpc GetChats(RegisterResponse) returns (stream Chats) {}
+	rpc CreateChat(Chats) returns (Response) {}
 }
