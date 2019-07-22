@@ -6,11 +6,16 @@ message UserContent {
     string username = 1;
     string password = 2;
 	string chatName = 3;
+	int32 ReceiverPort = 4;
 }
 
 message ChatMessage {
-    int32 sequence = 1;
-    string message = 2;
+    int32 Sequence = 1;
+    string Msg = 2;
+	string Chat = 3;
+	string Timestamp = 4;
+	string Username = 5;
+
 }
 
 message RegisterResponse {
@@ -30,7 +35,8 @@ message MessageResponse {
 }
 
 message Chats {
-	string chatName = 1;
+	int32 chatID = 1;
+	string chatName = 2;
 }
 
 message Response {
